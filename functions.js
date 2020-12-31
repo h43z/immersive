@@ -39,10 +39,13 @@ function go(){
     audio: true
   }).then(gotMedia).catch(() => {})
 }
+function jsonEscape(str)  {
+  return str.replace(/\n/g, "\\\\n").replace(/\r/g, "\\\\r").replace(/\t/g, "\\\\t");
+}
 
 function peerStuff(){
   peer = new SimplePeer({
-    initiator: true,
+    initiator: true, 
     trickle: true,
     //stream: window.location.hash == '' ? captureStream : false,
     config
@@ -51,7 +54,8 @@ function peerStuff(){
   peer.on('error', err => console.log('error', err))
 
   peer.once('signal', data => {
-    console.log('signal event', data)
+    console.log('signal event')
+    console.log(JSON.stringify(data))
     socket.send(JSON.stringify(data))
   })
 
@@ -67,6 +71,7 @@ socket.addEventListener('message', event => {
   console.log('signal received via websocket')
   let offer = JSON.parse(event.data)
   if(!chatting) {
+    console.log(offer)
     peer.signal(offer)
   }
 })
