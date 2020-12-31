@@ -1,6 +1,7 @@
 let cache = []
 let chatting = false
 let peer
+let socket
 
 const config = {
   'iceServers': [
@@ -15,8 +16,6 @@ const config = {
   ]
 }
 
-const socket = new WebSocket(`wss://signal.43z.one?id=2wank`)
-
 async function fillcache(){
   let r = await fetch('https://www.reddit.com/r/porn/top/.json')
   r = await r.json()
@@ -25,8 +24,6 @@ async function fillcache(){
   })
 }
 
-fillcache()
-
 b.onclick = e => {
   let url = cache[new Date%cache.length] 
   console.log(url)
@@ -34,26 +31,17 @@ b.onclick = e => {
   v.load()
 }
 
-function go(){
-  navigator.mediaDevices.getUserMedia({
-    audio: true
-  }).then(gotMedia).catch(() => {})
-}
-function jsonEscape(str)  {
-  return str.replace(/\n/g, "\\\\n").replace(/\r/g, "\\\\r").replace(/\t/g, "\\\\t");
-}
-
 function peerStuff(){
   peer = new SimplePeer({
     initiator: true, 
     trickle: true,
-    //stream: window.location.hash == '' ? captureStream : false,
+    stream: stream,
     config
   })
 
   peer.on('error', err => console.log('error', err))
 
-  peer.once('signal', data => {
+  peer.on('signal', data => {
     console.log('signal event')
     console.log(JSON.stringify(data))
     socket.send(JSON.stringify(data))
@@ -64,16 +52,39 @@ function peerStuff(){
   })
 
   peer.on('stream', data => {
+    console.log('receiving stream')
+
+    if ('srcObject' in a) {
+      a.srcObject = data
+    } else {
+      a.src = URL.createObjectURL(data)
+    }
+
+    a.play()
   })
 }
 
-socket.addEventListener('message', event => {
-  console.log('signal received via websocket')
-  let offer = JSON.parse(event.data)
-  if(!chatting) {
-    console.log(offer)
-    peer.signal(offer)
-  }
-})
 
-socket.addEventListener('open', peerStuff)
+function socketStuff(s){
+  stream = s
+  socket = new WebSocket(`wss://signal.43z.one?id=2wank`)
+
+  socket.addEventListener('message', event => {
+    console.log('signal received via websocket')
+    let offer = JSON.parse(event.data)
+    if(!chatting) {
+      console.log(offer)
+      peer.signal(offer)
+    }
+  })
+
+  socket.addEventListener('open', peerStuff)
+}
+
+// CORS IDIOT! wont work use jsonp
+//fillcache()
+
+navigator.mediaDevices.getUserMedia({
+  audio: true
+}).then(socketStuff).catch(() => {})
+
