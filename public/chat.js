@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://${document.domain}/ws`)
+const ws = new WebSocket(`wss://${document.domain}/ws`)
 let lastMsgTimer = null
 
 ws.onmessage = e => {
