@@ -13,7 +13,7 @@ router.get('/', async ctx => {
   await ctx.render('chat.pug')
 })
 
-const wss = new WebSocketServer({ port: 8080 })
+const wss = new WebSocketServer({port: 3035})
 
 wss.on('connection', ws => {
 
