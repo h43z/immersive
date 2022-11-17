@@ -1,0 +1,45 @@
+*{
+  margin:0;
+  padding:0;
+  border: none;
+}
+
+html{
+  background-color:#ff;
+  font-family: 'Verdana';
+}
+
+#input{
+  position: absolute;
+  bottom: 0px;
+  height: 30px;
+  padding: 5px 10px;
+  outline: none;
+  border-radius: 10px 10px 0 0;
+  width: 100px;
+  left: calc(50% - 50px);
+  background-color: #D3C4D1;
+}
+
+.msg{
+  font-size: 2.4em;
+  margin: 0 auto;
+  animation: fadeinout 3.2s forwards;
+  opacity: 0;
+  margin-right: 10px;
+  overflow-wrap: break-word;
+  font-weight: bold;
+}
+
+@keyframes fadeinout{
+  50% { opacity: 1 }
+}
+
+.msg.other{
+  color: #5887FF;
+}
+
+#chat{
+  padding: 10px;
+  overflow: hidden;
+}
