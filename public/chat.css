@@ -2,44 +2,140 @@
   margin:0;
   padding:0;
   border: none;
+  color: #41525d;
 }
 
 html{
-  background-color:#ff;
   font-family: 'Verdana';
 }
 
 #input{
-  position: absolute;
-  bottom: 0px;
+
+  grid-area: input;
+  align-self:end;
+
   height: 30px;
-  padding: 5px 10px;
+  padding: 12px 12px 5px 12px;
+  resize: none;
   outline: none;
   border-radius: 10px 10px 0 0;
-  width: 100px;
-  left: calc(50% - 50px);
-  background-color: #D3C4D1;
+  background-color: #D6E4E5;
+  border: 1px solid #497174;
+  border-width: 1px 1px 0 1px;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 .msg{
-  font-size: 2.4em;
-  margin: 0 auto;
-  animation: fadeinout 3.2s forwards;
-  opacity: 0;
-  margin-right: 10px;
+  animation: fadeout 8s linear forwards;
   overflow-wrap: break-word;
   font-weight: bold;
+  font-size: 35px;
+  text-decoration: underline;
+  text-decoration-thickness: 4px;
 }
 
-@keyframes fadeinout{
-  50% { opacity: 1 }
+.msg.own{
+  text-decoration: none;
+  color: #59778b;
 }
 
 .msg.other{
-  color: #5887FF;
 }
 
-#chat{
-  padding: 10px;
-  overflow: hidden;
+@keyframes fadeout{
+  from {opacity: 0}
+  10% {opacity: 1}
+  to {opacity: 0}
+}
+
+div#chat{
+  height: 90%;
+  grid-area: chat;
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: center;
+  gap: 0px 8px;
+  overflow:hidden;
+  /*hack use border as padding*/
+  border: 20px solid transparent;
+  box-sizing: border-box;
+}
+
+#viewers{
+
+  grid-area: viewers;
+  align-self:end;
+  justify-self: center;
+  width: 30px;
+  heigth: 20px;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+  background-color: #D6E4E5;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid #497174;
+  border-width: 1px 1px 0 1px;
+}
+
+html,body,#app{height: 100%}
+
+#app{
+  background-color: #EFF5F5;
+  display:grid;
+  grid-template-rows: auto 70px;
+  grid-template-columns: 1fr 130px 1fr;
+  grid-template-areas: 
+    "chat chat chat"
+    ". input viewers" ;
+}
+
+.simple-keyboard{
+  grid-area: keyboard;
+  display: none;
+}
+
+@media screen and (min-width: 800px) {
+  div#app{
+    width: 380px;
+    margin: 0px auto;
+    max-height: 750px;
+    position: relative;
+    border-radius: 15px;
+    border-width: 40px 13px 0px;
+    outline: 10px solid black;
+    grid-template-areas: 
+      "chat chat chat"
+      ". input viewers" 
+      "keyboard keyboard keyboard";
+
+    grid-template-rows: 1fr 70px auto;
+  }
+  div#chat{
+    height: 70% !important;
+  }
+  body{
+    box-sizing: border-box;
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+
+  .pattern{
+    position: fixed;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.9;
+    background: linear-gradient(135deg, #e5b3b355 25%, transparent 25%) -29px 0/ 58px 58px, linear-gradient(225deg, #e5b3b3 25%, transparent 25%) -29px 0/ 58px 58px, linear-gradient(315deg, #e5b3b355 25%, transparent 25%) 0px 0/ 58px 58px, linear-gradient(45deg, #e5b3b3 25%, #9494b0 25%) 0px 0/ 58px 58px;
+  }
+
+  .simple-keyboard{
+    display: block;
+    align-self:end;
+  }
 }

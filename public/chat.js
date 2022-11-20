@@ -1,34 +1,69 @@
-const ws = new WebSocket(`wss://${document.domain}/ws`)
-let lastMsgTimer = null
+let ws = null
+let chatCleanUp = null
+let lastMsgElement = null
 
-ws.onmessage = e => {
-  const obj = JSON.parse(e.data)
-  console.log(e.data)
-  display(obj)
+const connect = _ => {
+  const room = location.pathname.split('/')[1]
+  ws = new WebSocket(`wss://${document.domain}/ws?room=${room ? room : 'main'}`)
+
+  ws.onmessage = e => {
+    const obj = JSON.parse(e.data)
+    switch(obj.a){
+      case 1:
+        display(obj)
+      break;
+      case 2:
+        viewers.innerText = `${obj.d} 👥`
+      break;
+    }
+  }
+
+  ws.onerror = _ => ws.close()
+  ws.onclose = _ => setTimeout(connect, 1000)
 }
 
-input.addEventListener('keyup', event => {
-  if(event.key === "Enter" || input.value.charCodeAt(input.value.length -1) == 32){
-    ws.send(input.value)
-    input.value = ""
-  }
+
+input.addEventListener('input', event => {
+  if(/^[a-z0-9-+"']+$/i.test(event.data) || !ws.readyState)
+    return
+
+  ws.send(input.value.trim())
+  input.value = ''
 })
 
+input.addEventListener('keyup', event => {
+  if(event.key !== 'Enter' || !ws.readyState)
+    return
+
+  ws.send(input.value.trim())
+  input.value = ''
+})
+
+
 const display = obj => {
-  clearTimeout(lastMsgTimer)
+  const msg = document.createElement('div')
 
-  chat.style = `height: ${document.documentElement.clientHeight - input.offsetHeight - 10}px`
+  msg.style.textDecorationColor = obj.c 
+  msg.classList.add('msg', obj.o ? 'own' : 'other')
+  msg.innerText = obj.d
 
-  const s = document.createElement('span')
-  s.innerText = obj.msg
-  s.style.color = obj.own ? 'black' : obj.color
-  s.className = `msg`
-  chat.appendChild(s)
-  s.scrollIntoView()
-  
-  lastMsgTimer = setTimeout(_=>{
-    document.querySelectorAll('.msg').forEach(item => {
-      item.remove()
-    })
-  }, 3200)
+  chat.appendChild(msg)
+
+  lastMsgElement = msg
+
+  msg.scrollIntoView()
+
+  clearTimeout(chatCleanUp)
+
+  chatCleanUp = setTimeout(_=> {
+    document.querySelector('#chat').innerHTML = ''
+  }, 8000)
 }
+
+window.onresize = e => {
+  if(lastMsgElement)
+    lastMsgElement.scrollIntoView()
+}
+
+input.focus()
+connect()
