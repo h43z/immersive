@@ -46,6 +46,26 @@ wss.on('connection', (ws, req) => {
     return count
   }
 
+  if(getRoomSize() === 1){
+    let v = 600
+    const c = randomColor();
+    `🤖 Welcome to an immersive way of text chatting. Ohhh and tap screen to send love.`
+    .split(' ').forEach((msg, i, arr) => {
+      setTimeout(_=> {
+        ws.send(JSON.stringify({a: 1, d: msg, c}))
+
+        if(i === arr.length-1){
+          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 500)
+          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 800)
+          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1000)
+          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1300)
+        }
+
+      }, v=v+140+(100*msg.length)+ (i===9?1500:0))
+
+    })
+  }
+
   console.log(`new connection in room ${ws.room}`)
 
   roomCast({
@@ -54,16 +74,40 @@ wss.on('connection', (ws, req) => {
   })
 
   ws.on('message', data =>  {
+
     if(!data.length)
       return
 
+    let obj 
+
+    try{
+      obj = JSON.parse(data)
+    }catch(e){
+      console.log(e)
+      return
+    }
+
+
     console.log(data+'')
 
-    roomCast({
-      a: 1,
-      d: data+'',
-      c: ws.color
-    })
+    switch(obj.a){
+      case 1:
+        // msg
+        roomCast({
+          a: 1,
+          d: obj.d,
+          c: ws.color
+        })
+      break;
+      case 3:
+        //heart
+        roomCast({
+          a: 3,
+          c: ws.color
+        })
+      break;  
+    }
+
   })
 
   ws.on('close', e =>  {

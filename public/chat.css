@@ -33,6 +33,7 @@ html{
   font-size: 35px;
   text-decoration: underline;
   text-decoration-thickness: 4px;
+  user-select: none;
 }
 
 .msg.own{
@@ -50,7 +51,7 @@ html{
 }
 
 div#chat{
-  height: 90%;
+  position: relative;
   grid-area: chat;
   align-self: center;
   display: flex;
@@ -63,17 +64,19 @@ div#chat{
   overflow:hidden;
   /*hack use border as padding*/
   border: 20px solid transparent;
+  border-width: 0 20px 0 20px;
   box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 10%;
 }
 
 #viewers{
-
   grid-area: viewers;
   align-self:end;
   justify-self: center;
   width: 30px;
   heigth: 20px;
-  padding: 5px 10px;
+  padding: 10px 10px;
   font-size: 14px;
   font-weight: bold;
   user-select: none;
@@ -100,6 +103,10 @@ html,body,#app{height: 100%}
   display: none;
 }
 
+.heading, .heading2{
+  display: none;
+}
+
 @media screen and (min-width: 800px) {
   div#app{
     width: 380px;
@@ -117,7 +124,7 @@ html,body,#app{height: 100%}
     grid-template-rows: 1fr 70px auto;
   }
   div#chat{
-    height: 70% !important;
+    padding-bottom: 20%;
   }
   body{
     box-sizing: border-box;
@@ -130,12 +137,73 @@ html,body,#app{height: 100%}
     top: 0px;
     width: 100vw;
     height: 100vh;
-    opacity: 0.9;
     background: linear-gradient(135deg, #e5b3b355 25%, transparent 25%) -29px 0/ 58px 58px, linear-gradient(225deg, #e5b3b3 25%, transparent 25%) -29px 0/ 58px 58px, linear-gradient(315deg, #e5b3b355 25%, transparent 25%) 0px 0/ 58px 58px, linear-gradient(45deg, #e5b3b3 25%, #9494b0 25%) 0px 0/ 58px 58px;
+    z-index:-999;
   }
 
   .simple-keyboard{
     display: block;
     align-self:end;
   }
+
+  .heading{
+    display: block;
+    font-size: 90px;
+    position: fixed;
+    left: calc(50% + 220px);
+    text-shadow: 5px 5px #F08A4B ;
+    transform: rotate(20deg);
+    padding: 10px;
+    line-height: 90px;
+    letter-spacing: -3px;
+    top: 100px;
+    text-align: center;
+  }
+  .heading > div{
+    color: #F3CA40;
+    font-weight: bold;
+  }
+
+  .heading2{
+    display: block;
+    font-size: 80px;
+    position: fixed;
+    right: calc(50% + 220px);
+    text-shadow: 5px 5px #F08A4B ;
+    transform: rotate(-15deg);
+    padding: 10px;
+    top: 400px;
+    line-height: 90px;
+    letter-spacing: -3px;
+    text-align: center;
+  }
+  .heading2 > div{
+    color: #F3CA40;
+    font-weight: bold;
+  }
+}
+
+.heart{
+  color: transparent;
+  font-size: 50px;
+  animation: flyaway 1.0s ease-out forwards;
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+  user-select: none;
+}
+
+@keyframes flyaway{
+  from {opacity: 0.3}
+  to {opacity: 0.8;bottom: 100%;transform: rotate(0deg)}
+}
+
+.riseup{
+  animation: riseup 0.3s ease-out forwards;
+}
+
+@keyframes riseup{
+  from {height: 20px}
+  50% {height: 30px}
+  to {height: 20px; }
 }

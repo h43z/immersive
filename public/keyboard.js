@@ -40,6 +40,10 @@ let keyboard = new Keyboard({
 
 input.addEventListener("input", event => {
   keyboard.setInput(event.target.value);
+
+  if(!/^[a-z]+$/.test(event.data))
+    return
+
 	keyboard.dispatch(instance => {
     instance.addButtonTheme(event.data, "hg-activeButton");
     setTimeout(_=>{
@@ -67,10 +71,10 @@ function onKeyPress(button) {
     return
   }
 
-  if(/^[a-z0-9-+"']+$/i.test(button) || !ws.readyState)
+  if(/^[äöüßa-z0-9-+"']+$/i.test(button) || !ws.readyState)
     return
 
-  ws.send(input.value.trim())
+  send({a:1,d:input.value.trim()})
   input.value = ''
   keyboard.setInput('')
 }

@@ -13,7 +13,10 @@ const connect = _ => {
         display(obj)
       break;
       case 2:
-        viewers.innerText = `${obj.d} 👥`
+        riseup(obj)
+      break;
+      case 3:
+        heart(obj)
       break;
     }
   }
@@ -24,21 +27,45 @@ const connect = _ => {
 
 
 input.addEventListener('input', event => {
-  if(/^[a-z0-9-+"']+$/i.test(event.data) || !ws.readyState)
+  if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) || !ws.readyState)
     return
 
-  ws.send(input.value.trim())
+  send({a:1,d:input.value.trim()})
   input.value = ''
+  if(keyboard)
+    keyboard.setInput('')
 })
 
 input.addEventListener('keyup', event => {
   if(event.key !== 'Enter' || !ws.readyState)
     return
 
-  ws.send(input.value.trim())
+  send({a:1,d:input.value.trim()})
   input.value = ''
+  if(keyboard)
+    keyboard.setInput('')
 })
 
+const riseup = obj => {
+  viewers.innerText = `${obj.d} 👥`
+
+  if(viewers.classList.contains('riseup') || obj.d === 1)
+    return
+
+  viewers.offsetWidth
+  viewers.classList.add('riseup')
+  viewers.onanimationend = e => viewers.classList.remove('riseup')
+}
+
+const heart = obj => {
+  const div = document.createElement('div')
+  div.innerText = '💜'
+  div.className = 'heart'
+  div.style.textShadow = `0 0 0 ${obj.c}`
+  div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
+  div.onanimationend = e => e.target.remove()
+  chat.appendChild(div)
+}
 
 const display = obj => {
   const msg = document.createElement('div')
@@ -63,7 +90,26 @@ const display = obj => {
 window.onresize = e => {
   if(lastMsgElement)
     lastMsgElement.scrollIntoView()
+
+  const vks = Math.min(app.clientWidth/screen.width, app.clientHeight/screen.height) < 0.7
+
+  if(!vks)
+    input.blur()
 }
 
-input.focus()
+app.onmousedown = e => {
+  if(e.target !== input)
+    e.preventDefault()
+
+  if(document.activeElement === input)
+    e.preventDefault()
+
+  if(e.target === app || e.target === chat)
+    send({a:3})
+}
+
+const send = obj => {
+  ws.send(JSON.stringify(obj))
+}
+
 connect()
