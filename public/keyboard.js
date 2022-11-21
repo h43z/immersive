@@ -75,8 +75,11 @@ function onKeyPress(button) {
     return
 
   send({a:1,d:input.value.trim()})
-  input.value = ''
-  keyboard.setInput('')
+  setTimeout(_=>{
+    // bug in the simple keyboard that makes this necessary
+    input.value=''
+    keyboard.clearInput()
+  })
 }
 
 function handleShift() {

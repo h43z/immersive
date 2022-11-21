@@ -68,6 +68,7 @@ div#chat{
   box-sizing: border-box;
   height: 100%;
   padding-bottom: 10%;
+
 }
 
 #viewers{
@@ -75,7 +76,6 @@ div#chat{
   align-self:end;
   justify-self: center;
   width: 30px;
-  heigth: 20px;
   padding: 10px 10px;
   font-size: 14px;
   font-weight: bold;
@@ -89,13 +89,17 @@ div#chat{
 html,body,#app{height: 100%}
 
 #app{
-  background-color: #EFF5F5;
   display:grid;
   grid-template-rows: auto 70px;
   grid-template-columns: 1fr 130px 1fr;
   grid-template-areas: 
     "chat chat chat"
     ". input viewers" ;
+
+  background-color: #EFF5F5;
+  opacity: 1;
+  background-image: radial-gradient(#d6e4e5 0.65px, #EFF5F5 0.65px);
+  background-size: 13px 13px;
 }
 
 .simple-keyboard{

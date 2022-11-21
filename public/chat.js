@@ -14,8 +14,10 @@ const connect = _ => {
       break;
       case 2:
         riseup(obj)
+        heart(obj)
       break;
       case 3:
+        riseup(obj)
         heart(obj)
       break;
     }
@@ -33,7 +35,7 @@ input.addEventListener('input', event => {
   send({a:1,d:input.value.trim()})
   input.value = ''
   if(keyboard)
-    keyboard.setInput('')
+    keyboard.clearInput()
 })
 
 input.addEventListener('keyup', event => {
@@ -43,13 +45,14 @@ input.addEventListener('keyup', event => {
   send({a:1,d:input.value.trim()})
   input.value = ''
   if(keyboard)
-    keyboard.setInput('')
+    keyboard.clearInput()
 })
 
 const riseup = obj => {
-  viewers.innerText = `${obj.d} 👥`
+  if(obj.d)
+    viewers.innerText = `${obj.d} 👥`
 
-  if(viewers.classList.contains('riseup') || obj.d === 1)
+  if(viewers.classList.contains('riseup'))
     return
 
   viewers.offsetWidth
@@ -73,6 +76,9 @@ const display = obj => {
   msg.style.textDecorationColor = obj.c 
   msg.classList.add('msg', obj.o ? 'own' : 'other')
   msg.innerText = obj.d
+
+  if(lastMsgElement && lastMsgElement.className !== msg.className)
+    lastMsgElement.style.paddingRight = '15px'
 
   chat.appendChild(msg)
 
@@ -113,3 +119,4 @@ const send = obj => {
 }
 
 connect()
+input.focus()

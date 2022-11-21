@@ -49,11 +49,10 @@ wss.on('connection', (ws, req) => {
   if(getRoomSize() === 1){
     let v = 600
     const c = randomColor();
-    `🤖 Welcome to an immersive way of text chatting. Ohhh and tap screen to send love.`
+    `🤖 Welcome to an immersive way of text chatting. To send love just tap the spacebar`
     .split(' ').forEach((msg, i, arr) => {
       setTimeout(_=> {
         ws.send(JSON.stringify({a: 1, d: msg, c}))
-
         if(i === arr.length-1){
           setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 500)
           setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 800)
@@ -71,6 +70,7 @@ wss.on('connection', (ws, req) => {
   roomCast({
     a: 2,
     d: getRoomSize(),
+    c: ws.color
   })
 
   ws.on('message', data =>  {
@@ -94,7 +94,7 @@ wss.on('connection', (ws, req) => {
       case 1:
         // msg
         roomCast({
-          a: 1,
+          a: obj.d !== ''? 1 : 3,
           d: obj.d,
           c: ws.color
         })
@@ -137,4 +137,4 @@ app.use(bodyParser())
 app.use(serve('public'))
 app.use(views('views'))
 app.use(router.routes())
-app.listen(3034)//, '127.0.0.1')
+app.listen(3034, '127.0.0.1')
