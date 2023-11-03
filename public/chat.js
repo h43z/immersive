@@ -17,7 +17,6 @@ const connect = _ => {
         heart(obj)
       break;
       case 3:
-        riseup(obj)
         heart(obj)
       break;
     }
@@ -26,7 +25,6 @@ const connect = _ => {
   ws.onerror = _ => ws.close()
   ws.onclose = _ => setTimeout(connect, 1000)
 }
-
 
 input.addEventListener('input', event => {
   if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) || !ws.readyState)
@@ -65,6 +63,7 @@ const heart = obj => {
   div.innerText = '💜'
   div.className = 'heart'
   div.style.textShadow = `0 0 0 ${obj.c}`
+  div.style.right = `${Math.floor(Math.random()*30)}px`
   div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
   div.onanimationend = e => e.target.remove()
   chat.appendChild(div)
@@ -93,15 +92,20 @@ const display = obj => {
   }, 8000)
 }
 
-window.onresize = e => {
-  if(lastMsgElement)
-    lastMsgElement.scrollIntoView()
+window.visualViewport.addEventListener('resize', e => {
+  document.body.style.height = `${e.target.height}px`
+  setTimeout(_=>window.scrollTo(0,0),100)
+})
 
-  const vks = Math.min(app.clientWidth/screen.width, app.clientHeight/screen.height) < 0.7
-
-  if(!vks)
-    input.blur()
-}
+//window.onresize = e => {
+//  if(lastMsgElement)
+//    lastMsgElement.scrollIntoView()
+//
+//  const vks = Math.min(app.clientWidth/window.screen.width, app.clientHeight/window.screen.height) < 0.7
+//
+//  if(!vks)
+//    input.blur()
+//}
 
 app.onmousedown = e => {
   if(e.target !== input)

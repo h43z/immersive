@@ -14,7 +14,6 @@ html{
   grid-area: input;
   align-self:end;
 
-  height: 30px;
   padding: 12px 12px 5px 12px;
   resize: none;
   outline: none;
@@ -192,7 +191,6 @@ html,body,#app{height: 100%}
   font-size: 50px;
   animation: flyaway 1.0s ease-out forwards;
   position: absolute;
-  right: 5px;
   bottom: 0px;
   user-select: none;
 }
