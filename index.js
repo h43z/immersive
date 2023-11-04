@@ -6,7 +6,6 @@ import bodyParser from 'koa-bodyparser'
 import { WebSocketServer } from 'ws'
 import { parse } from 'url'
 
-
 const app = new Koa()
 const router = new Router()
 

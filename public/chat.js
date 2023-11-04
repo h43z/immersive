@@ -4,8 +4,14 @@ let lastMsgElement = null
 
 const connect = _ => {
   const room = location.pathname.split('/')[1]
-  ws = new WebSocket(`wss://${document.domain}/ws?room=${room ? room : 'main'}`)
+  let url
+  if(document.domain === 'localhost'){
+    url = `ws://${document.domain}:3035`
+  }else{
+    url = `wss://${document.domain}`
+  }
 
+  ws = new WebSocket(`${url}/ws?room=${room || 'main'}`)
   ws.onmessage = e => {
     const obj = JSON.parse(e.data)
     switch(obj.a){
