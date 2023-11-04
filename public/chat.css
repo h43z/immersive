@@ -71,6 +71,7 @@ div#chat{
 
 #viewers{
   grid-area: viewers;
+  position: relative;
   align-self:end;
   justify-self: center;
   width: 30px;

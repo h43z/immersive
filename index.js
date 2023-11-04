@@ -93,13 +93,15 @@ wss.on('connection', (ws, req) => {
       case 1:
         // msg
         roomCast({
+          // send a heart if message empty, spacebar was pressed
+          // otherwise send the message
           a: obj.d !== '' ? 1 : 3,
           d: obj.d,
           c: ws.color
         })
       break;
       case 3:
-        //heart
+        // these hearts come from chat onclicks
         roomCast({
           a: 3,
           c: ws.color

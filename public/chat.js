@@ -34,21 +34,19 @@ const connect = _ => {
 }
 
 input.addEventListener('input', event => {
-  if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) || !ws.readyState)
+  console.log('input', event.data, ws.readyState)
+
+  if(!ws.readyState)
+    return
+
+  // event.data == null on enter press
+  if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) && event.data !== null)
     return
 
   send({a:1,d:input.value.trim()})
   clear()
 })
 
-// needed because oninput does not register ENTER key
-input.addEventListener('keyup', event => {
-  if(event.key !== 'Enter' || !ws.readyState)
-    return
-
-  send({a:1,d:input.value.trim()})
-  clear()
-})
 
 const riseup = obj => {
   if(obj.d)
@@ -69,13 +67,17 @@ const clear = _ => {
 
 const heart = obj => {
   const div = document.createElement('div')
-  div.innerText = '💜'
+  div.innerText = '💙'
   div.className = 'heart'
   div.style.textShadow = `0 0 0 ${obj.c}`
   div.style.right = `${Math.floor(Math.random()*30)}px`
   div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
   div.onanimationend = e => e.target.remove()
-  chat.appendChild(div)
+  // cannot append it to chat
+  // because there is a bug
+  // hearts won't show up after some time
+  // flex box and absolte item weird behavior...
+  app.appendChild(div)
 }
 
 const display = obj => {
