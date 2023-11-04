@@ -10,10 +10,9 @@ html{
 }
 
 #input{
-
   grid-area: input;
   align-self:end;
-
+  font-family: 'Verdana';
   padding: 12px 12px 5px 12px;
   resize: none;
   outline: none;
@@ -23,6 +22,7 @@ html{
   border-width: 1px 1px 0 1px;
   font-weight: bold;
   font-size: 18px;
+  overflow: hidden;
 }
 
 .msg{
