@@ -31,7 +31,7 @@ wss.on('connection', (ws, req) => {
       if(client.room === ws.room)
         client.send(JSON.stringify({
           ...msg,
-          o: client === ws ? 1 : 0, 
+          o: client === ws ? 1 : 0,
         }))
     }
   }
@@ -48,7 +48,7 @@ wss.on('connection', (ws, req) => {
   if(getRoomSize() === 1){
     let v = 600
     const c = randomColor();
-    `🤖 Welcome to an immersive way of text chatting. To send love just tap the spacebar`
+    `🤖 Welcome to new way of texting. To send love just tap the spacebar.`
     .split(' ').forEach((msg, i, arr) => {
       setTimeout(_=> {
         ws.send(JSON.stringify({a: 1, d: msg, c}))
@@ -77,7 +77,7 @@ wss.on('connection', (ws, req) => {
     if(!data.length)
       return
 
-    let obj 
+    let obj
 
     try{
       obj = JSON.parse(data)
@@ -93,7 +93,7 @@ wss.on('connection', (ws, req) => {
       case 1:
         // msg
         roomCast({
-          a: obj.d !== ''? 1 : 3,
+          a: obj.d !== '' ? 1 : 3,
           d: obj.d,
           c: ws.color
         })
@@ -104,7 +104,7 @@ wss.on('connection', (ws, req) => {
           a: 3,
           c: ws.color
         })
-      break;  
+      break;
     }
 
   })

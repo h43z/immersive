@@ -3,15 +3,16 @@ let chatCleanUp = null
 let lastMsgElement = null
 
 const connect = _ => {
-  const room = location.pathname.split('/')[1]
+  const room = location.pathname.split('/')[1] || 'main'
   let url
+
   if(document.domain !== 'chat.43z.one'){
     url = `ws://${document.domain}:3035`
   }else{
     url = `wss://${document.domain}`
   }
 
-  ws = new WebSocket(`${url}/ws?room=${room || 'main'}`)
+  ws = new WebSocket(`${url}/ws?room=${room}`)
   ws.onmessage = e => {
     const obj = JSON.parse(e.data)
     switch(obj.a){
@@ -37,19 +38,16 @@ input.addEventListener('input', event => {
     return
 
   send({a:1,d:input.value.trim()})
-  input.value = ''
-  if(keyboard)
-    keyboard.clearInput()
+  clear()
 })
 
+// needed because oninput does not register ENTER key
 input.addEventListener('keyup', event => {
   if(event.key !== 'Enter' || !ws.readyState)
     return
 
   send({a:1,d:input.value.trim()})
-  input.value = ''
-  if(keyboard)
-    keyboard.clearInput()
+  clear()
 })
 
 const riseup = obj => {
@@ -62,6 +60,11 @@ const riseup = obj => {
   viewers.offsetWidth
   viewers.classList.add('riseup')
   viewers.onanimationend = e => viewers.classList.remove('riseup')
+}
+
+const clear = _ => {
+  input.value = ''
+  keyboard && keyboard.clearInput()
 }
 
 const heart = obj => {
@@ -91,6 +94,8 @@ const display = obj => {
 
   msg.scrollIntoView()
 
+  // kind of a problem. the cleanup won't happen
+  // if chat keeps on receiving messages
   clearTimeout(chatCleanUp)
 
   chatCleanUp = setTimeout(_=> {
@@ -98,16 +103,7 @@ const display = obj => {
   }, 8000)
 }
 
-//window.onresize = e => {
-//  if(lastMsgElement)
-//    lastMsgElement.scrollIntoView()
-//
-//  const vks = Math.min(app.clientWidth/window.screen.width, app.clientHeight/window.screen.height) < 0.7
-//
-//  if(!vks)
-//    input.blur()
-//}
-
+// send hearts by clicking into the chat
 app.onmousedown = e => {
   if(e.target !== input)
     e.preventDefault()
