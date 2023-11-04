@@ -5,7 +5,7 @@ let lastMsgElement = null
 const connect = _ => {
   const room = location.pathname.split('/')[1]
   let url
-  if(document.domain === 'localhost'){
+  if(document.domain !== 'chat.43z.one'){
     url = `ws://${document.domain}:3035`
   }else{
     url = `wss://${document.domain}`
@@ -78,7 +78,7 @@ const heart = obj => {
 const display = obj => {
   const msg = document.createElement('div')
 
-  msg.style.textDecorationColor = obj.c 
+  msg.style.textDecorationColor = obj.c
   msg.classList.add('msg', obj.o ? 'own' : 'other')
   msg.innerText = obj.d
 
@@ -97,11 +97,6 @@ const display = obj => {
     document.querySelector('#chat').innerHTML = ''
   }, 8000)
 }
-
-window.visualViewport.addEventListener('resize', e => {
-  document.body.style.height = `${e.target.height}px`
-  setTimeout(_=>window.scrollTo(0,0),100)
-})
 
 //window.onresize = e => {
 //  if(lastMsgElement)

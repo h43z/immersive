@@ -67,7 +67,6 @@ div#chat{
   box-sizing: border-box;
   height: 100%;
   padding-bottom: 10%;
-
 }
 
 #viewers{
@@ -87,8 +86,9 @@ div#chat{
 
 html,body,#app{height: 100%}
 
-#app{
+div#app{
   display:grid;
+
   grid-template-rows: auto 70px;
   grid-template-columns: 1fr 130px 1fr;
   grid-template-areas: 
@@ -106,7 +106,7 @@ html,body,#app{height: 100%}
   display: none;
 }
 
-.heading, .heading2{
+.heading, .heading2, .heading3{
   display: none;
 }
 
@@ -155,11 +155,11 @@ html,body,#app{height: 100%}
     position: fixed;
     left: calc(50% + 220px);
     text-shadow: 5px 5px #F08A4B ;
-    transform: rotate(20deg);
+    transform: rotate(10deg);
     padding: 10px;
     line-height: 90px;
     letter-spacing: -3px;
-    top: 100px;
+    top: 350px;
     text-align: center;
   }
   .heading > div{
@@ -175,12 +175,31 @@ html,body,#app{height: 100%}
     text-shadow: 5px 5px #F08A4B ;
     transform: rotate(-15deg);
     padding: 10px;
-    top: 400px;
+    top: 200px;
     line-height: 90px;
     letter-spacing: -3px;
     text-align: center;
   }
   .heading2 > div{
+    color: #F3CA40;
+    font-weight: bold;
+  }
+
+  .heading3{
+    display: block;
+    font-size: 80px;
+    position: fixed;
+    right: calc(50% + 220px);
+    text-shadow: 5px 5px #F08A4B ;
+    transform: rotate(15deg);
+    padding: 10px;
+    top: 500px;
+    line-height: 90px;
+    letter-spacing: -3px;
+    text-align: center;
+  }
+
+  .heading3 > div{
     color: #F3CA40;
     font-weight: bold;
   }
