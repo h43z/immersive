@@ -33,14 +33,17 @@ const connect = _ => {
   ws.onclose = _ => setTimeout(connect, 1000)
 }
 
+// chrome is a mess https://bugs.chromium.org/p/chromium/issues/detail?id=118639
+// test if this all works in safari
 input.addEventListener('input', event => {
-  console.log('input', event.data, ws.readyState)
-
   if(!ws.readyState)
     return
 
+  if(event.inputType === 'deleteContentBackward')
+    return
+
   // event.data == null on enter press
-  if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) && event.data !== null)
+  if(/^[äöüßa-z0-9-+"']+$/i.test(event.data) && event.inputType !== 'insertLineBreak')
     return
 
   send({a:1,d:input.value.trim()})
@@ -61,7 +64,7 @@ const riseup = obj => {
 }
 
 const clear = _ => {
-  input.value = ''
+  setTimeout(_=>input.value = '', 0)
   keyboard && keyboard.clearInput()
 }
 
