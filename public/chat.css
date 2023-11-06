@@ -11,6 +11,7 @@ html{
 }
 
 #input{
+  text-transform: lowercase;
   grid-area: input;
   align-self:end;
   font-family: 'Verdana';
@@ -23,25 +24,33 @@ html{
   border-width: 1px 1px 0 1px;
   font-weight: bold;
   font-size: 18px;
+  resize: none;
+  white-space: nowrap;
   overflow: hidden;
 }
 
-.msg{
+.char{
   animation: fadeout 8s linear forwards;
   overflow-wrap: break-word;
   font-weight: bold;
   font-size: 35px;
+  border: 0px solid red;
+}
+
+.word{
+  margin-left: 11px;
   text-decoration: underline;
   text-decoration-thickness: 4px;
   user-select: none;
+  border: 0px solid green;
 }
 
-.msg.own{
+.word.own{
   text-decoration: none;
   color: #59778b;
 }
 
-.msg.other{
+.word.other{
 }
 
 @keyframes fadeout{
@@ -60,7 +69,6 @@ div#chat{
   justify-content: flex-start;
   align-items: flex-start;
   align-content: center;
-  gap: 0px 8px;
   overflow:hidden;
   /*hack use border as padding*/
   border: 20px solid transparent;

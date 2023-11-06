@@ -8,6 +8,7 @@ import { parse } from 'url'
 
 const app = new Koa()
 const router = new Router()
+let counter = 0
 
 router.get('/', async ctx => {
   await ctx.render('chat.pug')
@@ -23,6 +24,7 @@ wss.on('connection', (ws, req) => {
 
   const query = parse(req.url, true).query
   ws.room = query.room || 'main'
+  ws.id = counter++
 
   ws.color = randomColor()
 
@@ -45,24 +47,24 @@ wss.on('connection', (ws, req) => {
     return count
   }
 
-  if(getRoomSize() === 1){
-    let v = 600
-    const c = randomColor();
-    `🤖 Welcome to new way of texting. To send love just tap the spacebar.`
-    .split(' ').forEach((msg, i, arr) => {
-      setTimeout(_=> {
-        ws.send(JSON.stringify({a: 1, d: msg, c}))
-        if(i === arr.length-1){
-          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 500)
-          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 800)
-          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1000)
-          setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1300)
-        }
+  //if(getRoomSize() === 1){
+  //  let v = 600
+  //  const c = randomColor();
+  //  `🤖 Welcome to new way of texting. To send love just tap the spacebar.`
+  //  .split(' ').forEach((msg, i, arr) => {
+  //    setTimeout(_=> {
+  //      ws.send(JSON.stringify({a: 1, d: msg, c}))
+  //      if(i === arr.length-1){
+  //        setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 500)
+  //        setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 800)
+  //        setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1000)
+  //        setTimeout(_=>ws.send(JSON.stringify({a:3,c})), 1300)
+  //      }
 
-      }, v=v+140+(100*msg.length)+ (i===9?1500:0))
+  //    }, v=v+140+(100*msg.length)+ (i===9?1500:0))
 
-    })
-  }
+  //  })
+  //}
 
   console.log(`new connection in room ${ws.room}`)
 
@@ -73,7 +75,6 @@ wss.on('connection', (ws, req) => {
   })
 
   ws.on('message', data =>  {
-
     if(!data.length)
       return
 
@@ -86,25 +87,39 @@ wss.on('connection', (ws, req) => {
       return
     }
 
-
     console.log(data+'')
 
     switch(obj.a){
       case 1:
         // msg
         roomCast({
-          // send a heart if message empty, spacebar was pressed
-          // otherwise send the message
-          a: obj.d !== '' ? 1 : 3,
+          a: 1,
           d: obj.d,
-          c: ws.color
+          c: ws.color,
+          i: ws.id
         })
       break;
       case 3:
-        // these hearts come from chat onclicks
+        // heart
         roomCast({
           a: 3,
           c: ws.color
+        })
+      break;
+      case 4:
+        // replace full last word
+        roomCast({
+          a: 4,
+          d: obj.d,
+          c: ws.color,
+          i: ws.id
+        })
+      break;
+      case 5:
+        // end last word
+        roomCast({
+          a: 5,
+          i: ws.id
         })
       break;
     }
