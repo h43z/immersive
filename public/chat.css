@@ -40,7 +40,7 @@ html{
 .word{
   margin-left: 11px;
   text-decoration: underline;
-  text-decoration-thickness: 4px;
+  text-decoration-thickness: 6px;
   user-select: none;
   border: 0px solid green;
 }
@@ -48,9 +48,6 @@ html{
 .word.own{
   text-decoration: none;
   color: #59778b;
-}
-
-.word.other{
 }
 
 @keyframes fadeout{

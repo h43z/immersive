@@ -58,6 +58,9 @@ input.addEventListener('input', event => {
     return
   }
 
+// todo once a comple word is erased. delete it
+  // new word should appear at the end of chat convo
+
   if(
     input.value.endsWith(' ') ||
     input.value.endsWith('.') ||
@@ -67,12 +70,7 @@ input.addEventListener('input', event => {
     event.inputType === 'insertLineBreak'
   ){
     clear()
-
-    //// workaround swiftkey keyboard
-    //// if word ends with . two events are fired
-    //// last one is just a space so ignore
-    //if(!input.value.endsWith(' '))
-
+    // check do i need this if?!
     if(event.data?.trim().length)
       send({a:1,d:event.data.trim()})
 
@@ -96,14 +94,14 @@ input.addEventListener('input', event => {
 
   // below detects autocomplete for mircosoft swiftkey
   // ends last word
-  if(event.inputType === 'insertCompositionText'){
-    // weird behavoir every pressing of . triggers insertComposition...
-    // fix with the following if and don't care
-    if(!input.value.endsWith('.')){
-      send({a:4,d:input.value.trim()})
-      send({a:5})
-    }
-  }
+  //if(event.inputType === 'insertCompositionText'){
+  //  // weird behavoir every pressing of . triggers insertComposition...
+  //  // fix with the following if and don't care
+  //  if(!input.value.endsWith('.')){
+  //    send({a:4,d:input.value.trim()})
+  //    send({a:5})
+  //  }
+  //}
 
 
   if(event.inputType === 'deleteContentBackward'){
@@ -161,7 +159,9 @@ const endWord = obj => {
 
 const createWord = obj => {
   const word = document.createElement('div')
-  word.style.textDecorationColor = obj.c
+  //word.style.textDecorationColor = obj.c
+  word.style.color = obj.c
+  console.log(obj.c)
   word.classList.add('word', obj.o ? 'own' : 'other')
   word.classList.add(`user-${obj.i}`)
   return word
@@ -195,7 +195,7 @@ const heart = obj => {
   const div = document.createElement('div')
   div.innerText = '💙'
   div.className = 'heart'
-  div.style.textShadow = `0 0 0 ${obj.c}`
+  div.style.textShadow = `0 0 0 ${obj.o ? '#41525d': obj.c}`
   div.style.right = `${Math.floor(Math.random()*30)}px`
   div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
   div.onanimationend = e => e.target.remove()
