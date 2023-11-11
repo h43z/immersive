@@ -24,7 +24,7 @@ wss.on('connection', (ws, req) => {
 
   const query = parse(req.url, true).query
   ws.room = query.room || 'main'
-  ws.id = counter++
+  ws.uid = counter++
 
   ws.color = randomColor()
 
@@ -33,7 +33,9 @@ wss.on('connection', (ws, req) => {
       if(client.room === ws.room)
         client.send(JSON.stringify({
           ...msg,
-          o: client === ws ? 1 : 0,
+          own: client === ws ? 1 : 0,
+          color: ws.color,
+          uid: ws.uid
         }))
     }
   }
@@ -45,6 +47,14 @@ wss.on('connection', (ws, req) => {
         count++
     }
     return count
+  }
+
+  const sendUserCount = _ => {
+    roomCast({
+      action: 'usercount',
+      data: getRoomSize(),
+      color: ws.color
+    })
   }
 
   //if(getRoomSize() === 1){
@@ -68,11 +78,7 @@ wss.on('connection', (ws, req) => {
 
   console.log(`new connection in room ${ws.room}`)
 
-  roomCast({
-    a: 2,
-    d: getRoomSize(),
-    c: ws.color
-  })
+  sendUserCount()
 
   ws.on('message', data =>  {
     if(!data.length)
@@ -88,50 +94,12 @@ wss.on('connection', (ws, req) => {
     }
 
     console.log(data+'')
-
-    switch(obj.a){
-      case 1:
-        // msg
-        roomCast({
-          a: 1,
-          d: obj.d,
-          c: ws.color,
-          i: ws.id
-        })
-      break;
-      case 3:
-        // heart
-        roomCast({
-          a: 3,
-          c: ws.color
-        })
-      break;
-      case 4:
-        // replace full last word
-        roomCast({
-          a: 4,
-          d: obj.d,
-          c: ws.color,
-          i: ws.id
-        })
-      break;
-      case 5:
-        // end last word
-        roomCast({
-          a: 5,
-          i: ws.id
-        })
-      break;
-    }
-
+    roomCast(obj)
   })
 
   ws.on('close', e =>  {
     console.log(`closed connection from ${ws.room}`)
-    roomCast({
-      a: 2,
-      d: getRoomSize(),
-    })
+    sendUserCount()
   })
 })
 

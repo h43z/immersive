@@ -11,7 +11,7 @@ html{
 }
 
 #input{
-  text-transform: lowercase;
+  /*text-transform: lowercase;*/
   grid-area: input;
   align-self:end;
   font-family: 'Verdana';
@@ -34,22 +34,21 @@ html{
   overflow-wrap: break-word;
   font-weight: bold;
   font-size: 35px;
+  text-decoration: underline;
+  text-decoration-thickness: 6px;
   border: 0px solid red;
 }
 
 .word{
   margin-left: 11px;
-  text-decoration: underline;
-  text-decoration-thickness: 6px;
   user-select: none;
   border: 0px solid green;
 }
 
-.word.own{
+.char.own{
   text-decoration: none;
   color: #59778b;
 }
-
 @keyframes fadeout{
   from {opacity: 0}
   10% {opacity: 1}
@@ -235,3 +234,10 @@ div#app{
   50% {height: 30px}
   to {height: 20px; }
 }
+
+span.char.deleted{
+  opacity: 0.01; /*wth does not work in chrome android*/
+  color: transparent;
+  text-decoration: none;
+}
+

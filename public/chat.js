@@ -1,6 +1,5 @@
 let ws = null
-let chatCleanUp = null
-let lastMsgElement = null
+let autoClearChat = null
 
 const connect = _ => {
   const room = location.pathname.split('/')[1] || 'main'
@@ -16,24 +15,27 @@ const connect = _ => {
   ws.onmessage = e => {
     const obj = JSON.parse(e.data)
     console.log('received', obj)
-    switch(obj.a){
-      case 1:
-        append(obj)
+    switch(obj.action){
+      case 'heart':
+        showHeart(obj)
+        break;
+      case 'text':
+        showText(obj)
+        break;
+      case 'endofword':
+        getLastUserWord(obj.uid)?.classList.add('end')
+        break;
+      case 'usercount':
+        updateUserCount(obj)
+        showHeart(obj)
       break;
-      case 2:
-        riseup(obj)
-        heart(obj)
-      break;
-      case 3:
-        heart(obj)
-      break;
-      case 4:
-        replace(obj)
-      break;
-      case 5:
-        //mark end of word
-        endWord(obj)
-      break;
+    }
+
+    if(obj.action === 'text'){
+      clearTimeout(autoClearChat)
+      autoClearChat = setTimeout(_=> {
+        chat.innerHTML = ''
+      }, 8000)
     }
   }
 
@@ -41,142 +43,171 @@ const connect = _ => {
   ws.onclose = _ => setTimeout(connect, 1000)
 }
 
-// chrome is a mess https://bugs.chromium.org/p/chromium/issues/detail?id=118639
-// test if this all works in safari
-input.addEventListener('input', event => {
-  //console.log(event)
-  //alert(`${event.inputType} |${event.data}| |${input.value}| ${event.data.length}`)
+const showText = obj => {
+  // there is still a condition to fix
+  // what if user joins mid word
 
-  if(!ws.readyState)
-    return
+  let lastUserWord = getLastUserWord(obj.uid)
 
-  // on space send a heart if input is otherwise empty
-  // has to be the first check
-  if(event.inputType === 'insertText' && event.data === ' ' && input.value === ' '){
-    send({a:3})
-    clear()
-    return
-  }
-
-// todo once a comple word is erased. delete it
-  // new word should appear at the end of chat convo
-
-  if(
-    input.value.endsWith(' ') ||
-    input.value.endsWith('.') ||
-    input.value.endsWith(',') ||
-    input.value.endsWith('!') ||
-    input.value.endsWith('?') ||
-    event.inputType === 'insertLineBreak'
-  ){
-    clear()
-    // check do i need this if?!
-    if(event.data?.trim().length)
-      send({a:1,d:event.data.trim()})
-
-    send({a:5})
-    return
-  }
-
-  // detect normal typing, charachter by character
-  // event.data === ' ' for swiftkey on autocomplete press
-  if(event.inputType === 'insertText' && event.data.length === 1 && event.data !== ' '){
-    send({a:1,d:event.data})
-  }
-
-  // detect autocomplete, pressing on suggested word on virtual keyboard
-  // if detected replace the full word, below works for gboard
-  // ends last word
-  if((event.inputType === 'insertText' || event.inputType === 'insertFromPaste') && event.data.length > 1){
-    send({a:4,d:input.value.trim()})
-    send({a:5})
-  }
-
-  // below detects autocomplete for mircosoft swiftkey
-  // ends last word
-  //if(event.inputType === 'insertCompositionText'){
-  //  // weird behavoir every pressing of . triggers insertComposition...
-  //  // fix with the following if and don't care
-  //  if(!input.value.endsWith('.')){
-  //    send({a:4,d:input.value.trim()})
-  //    send({a:5})
-  //  }
-  //}
-
-
-  if(event.inputType === 'deleteContentBackward'){
-    // delete either last character or full word
-    // maybe best just to replace the full word
-    send({a:4,d:input.value.trim()})
-    return
-  }
-
-
-})
-
-const append = obj => {
-  const char = createChar(obj)
-  char.innerText = obj.d
-
-  let lastUserWord = getLastUserWord(obj.i)
-
-  if(!lastUserWord || lastUserWord.classList.contains('end')){
-    lastUserWord = createWord(obj)
+  if(!lastUserWord){
+    lastUserWord = createEmptyWord(obj)
     chat.appendChild(lastUserWord)
   }
 
-  lastUserWord.appendChild(char)
-  lastUserWord.scrollIntoView()
-}
+  let chars = lastUserWord.querySelectorAll('.char')
+  const addChars = []
 
-const replace = obj => {
-  // it's either a deletion, backspace or autocompletion
-  // in all cases switch out the whole last word from user
-  const lastUserWord = getLastUserWord(obj.i)
-
-  if(lastUserWord){
-    // creates a char span but use the full word as innerText
-    if(!obj.d.length){
-      lastUserWord.remove()
-    }else{
-      const chars = createChar(obj)
-      lastUserWord.innerHTML = createChar(obj).outerHTML
-    }
-  }else{
-    const word = createWord(obj)
-    const chars = createChar(obj)
-    word.appendChild(chars)
-    chat.appendChild(word)
+  if(obj.data.position === 0 && obj.data.value.length === 0){
+    lastUserWord.innerHTML = ''
+    lastUserWord.style.marginLeft = 0
   }
+
+  for(let i = 0; i < (obj.data.value.length || 1); i++){
+    const pos = obj.data.position
+    if(chars[pos + i]){
+      // update an existing char value
+      if(obj.data.value.length === 0){
+        chars[pos + i].classList.add('deleted')
+      }else{
+        chars[pos + i].innerText = obj.data.value[i]
+        chars[pos + i].classList.remove('deleted')
+      }
+    }else{
+      const newChar = createChar(i, obj)
+      lastUserWord.appendChild(newChar)
+    }
+  }
+
+  lastUserWord.scrollIntoView()
+
+  return
 }
 
-const endWord = obj => {
-  const lastUserWord = getLastUserWord(obj.i)
-
-  if(lastUserWord)
-    lastUserWord.classList.add('end')
-}
-
-const createWord = obj => {
-  const word = document.createElement('div')
-  //word.style.textDecorationColor = obj.c
-  word.style.color = obj.c
-  console.log(obj.c)
-  word.classList.add('word', obj.o ? 'own' : 'other')
-  word.classList.add(`user-${obj.i}`)
-  return word
-}
-
-const createChar = obj => {
+const createChar = (index, obj) => {
   const char = document.createElement('span')
-  char.classList.add('char')
-  char.innerText = obj.d
+  char.classList.add('char', obj.own ? 'own' : 'other')
+  char.style.textDecorationColor = obj.color
+  char.innerText = obj.data.value[index]
   return char
 }
 
-const riseup = obj => {
-  if(obj.d)
-    viewers.innerText = `${obj.d} 👥`
+const createEmptyWord = obj => {
+  const word = document.createElement('div')
+  word.style.color = obj.color
+  word.classList.add(`word`, `user-${obj.uid}`)
+  return word
+}
+
+const getLastUserWord = uid => {
+  return chat.querySelector(`.word.user-${uid}:not(.end)`)
+}
+
+const clearInput = _ => {
+  setTimeout(_=>input.value = '', 0)
+  keyboard && keyboard.clearInput()
+}
+
+const showHeart = obj => {
+  const div = document.createElement('div')
+  div.innerText = '💙'
+  div.className = 'heart'
+  div.style.textShadow = `0 0 0 ${obj.own ? '#59778b': obj.color}`
+  div.style.right = `${Math.floor(Math.random()*30)}px`
+  div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
+  div.onanimationend = e => e.target.remove()
+  // cannot append it to chat
+  // because there is a bug
+  // hearts won't show up after some time
+  // flex box and absolute item weird behavior...
+  app.appendChild(div)
+}
+
+let prevVal = ''
+let autoClearInput = null
+
+input.addEventListener('input', event => {
+  clearTimeout(autoClearInput)
+
+  send({input: {
+    data: event.data,
+    key: event.key,
+    inputValue: input.value
+  }})
+
+  let endOfWord = false
+  let val = input.value
+
+  if(val.trim() === '' && prevVal === ''){
+    send({action: 'heart'})
+    clearInput()
+    return
+  }
+
+  if(
+    val.endsWith(`, `) ||
+    val.endsWith(`. `) ||
+    val.endsWith(`? `) ||
+    val.endsWith(`! `)
+  ){
+    // catch automatic space insertion of microsoft swiftkey after punctuation
+    return
+  }
+
+  if(
+    val.endsWith(` `) ||
+    val.endsWith(`.`) ||
+    val.endsWith(`,`) ||
+    val.endsWith(`!`) ||
+    val.endsWith(`?`) ||
+    val.endsWith(`\n`) ||
+    /\p{Extended_Pictographic}/u.test(val)
+  ){
+    endOfWord = true
+  }
+
+  val = val.trim()
+
+  const pChars = [...prevVal]
+  const chars = [...val]
+
+  for(let i = 0; i < Math.max(chars.length, pChars.length); i++){
+    if(pChars[i] !== chars[i]){
+
+      if(i === 0 && chars.length === 0){
+        // but careful this also happens sometimes on gboard suggestions
+        // eg. wieder -> Wiedersehen
+        // or it means deleted the whole word with backspace
+        // mark it as end of the word
+        endOfWord = true
+      }
+      send({
+        action: 'text',
+        data: {
+          position: i,
+          value: chars.slice(i)
+        }
+      })
+      break;
+    }
+  }
+
+  if(endOfWord){
+    send({action: 'endofword'})
+    clearInput()
+    prevVal = ''
+  }else{
+    prevVal = val
+  }
+
+  autoClearInput = setTimeout(_=> {
+    clearInput()
+    send({action: 'endofword'})
+  }, 2000)
+})
+
+const updateUserCount = obj => {
+  if(obj.data)
+    viewers.innerText = `${obj.data} 👥`
 
   if(viewers.classList.contains('riseup'))
     return
@@ -184,64 +215,6 @@ const riseup = obj => {
   viewers.offsetWidth
   viewers.classList.add('riseup')
   viewers.onanimationend = e => viewers.classList.remove('riseup')
-}
-
-const clear = _ => {
-  setTimeout(_=>input.value = '', 0)
-  keyboard && keyboard.clearInput()
-}
-
-const heart = obj => {
-  const div = document.createElement('div')
-  div.innerText = '💙'
-  div.className = 'heart'
-  div.style.textShadow = `0 0 0 ${obj.o ? '#41525d': obj.c}`
-  div.style.right = `${Math.floor(Math.random()*30)}px`
-  div.style.transform = `rotate(${(Math.random() - 0.5) * 2*40}deg)`
-  div.onanimationend = e => e.target.remove()
-  // cannot append it to chat
-  // because there is a bug
-  // hearts won't show up after some time
-  // flex box and absolte item weird behavior...
-  app.appendChild(div)
-}
-
-//const display = obj => {
-//
-//  const msg = document.createElement('div')
-//
-//  msg.style.textDecorationColor = obj.c
-//  msg.classList.add('msg', obj.o ? 'own' : 'other')
-//  msg.classList.add(`user-${obj.i}`)
-//
-//  if(obj.d === ' ')
-//    msg.classList.add(`space`)
-//
-//
-//  msg.innerText = obj.d
-//
-//  //if(lastMsgElement && lastMsgElement.className !== msg.className)
-//    //  lastMsgElement.style.paddingRight = '15px'
-//
-//  chat.appendChild(msg)
-//
-//  lastMsgElement = msg
-//
-//  msg.scrollIntoView()
-//
-//  // kind of a problem. the cleanup won't happen
-//  // if chat keeps on receiving messages
-//  // shit ugly as hell
-//  clearTimeout(chatCleanUp)
-//
-//  chatCleanUp = setTimeout(_=> {
-//    document.querySelector('#chat').innerHTML = ''
-//  }, 8000)
-//}
-
-const getLastUserWord = user => {
-  const words = document.querySelectorAll(`.word.user-${user}`)
-  return words[words.length - 1]
 }
 
 // send hearts by clicking into the chat
@@ -253,7 +226,7 @@ app.onmousedown = e => {
     e.preventDefault()
 
   if(e.target === app || e.target === chat)
-    send({a:3})
+    send({action: 'heart'})
 }
 
 const send = obj => {
