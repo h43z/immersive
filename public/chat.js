@@ -161,7 +161,7 @@ input.addEventListener('input', event => {
     val.endsWith(`?`) ||
     val.endsWith(`\n`) ||
     /\p{Extended_Pictographic}/u.test(val) ||
-    [...val].pop().charCodeAt(0) === 160 // wtf safari, why no spaces?
+    [...val].pop()?.charCodeAt(0) === 160 // wtf safari, why no spaces?
   ){
     endOfWord = true
   }
@@ -201,8 +201,8 @@ input.addEventListener('input', event => {
   }
 
   autoClearInput = setTimeout(_=> {
-    clearInput()
     send({action: 'endofword'})
+    clearInput()
     prevVal = ''
   }, 2000)
 })
