@@ -202,6 +202,7 @@ input.addEventListener('input', event => {
   autoClearInput = setTimeout(_=> {
     clearInput()
     send({action: 'endofword'})
+    prevVal = ''
   }, 2000)
 })
 

@@ -21,17 +21,16 @@ html
       div REAL
       div TALK
 
-
     div.pattern
     div#app
       div#chat
-      div#viewers 1 👥 
+      div#viewers 1 👥
       textarea#input(rows='1', spellcheck=false, autocorrect='off', autocomplete='off', autocapitalize='off', placeholder='Text' )
       div.simple-keyboard
 
-  script(src='https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js')
-  script
-    include ../public/chat.js
-  script
-    include ../public/keyboard.js
+    script(src='https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js')
+    script
+      include ../public/chat.js
+    script
+      include ../public/keyboard.js
 
